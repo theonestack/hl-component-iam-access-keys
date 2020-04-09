@@ -1,0 +1,14 @@
+test_metadata:
+  type: config
+  name: users
+  description: list of users
+  
+users:
+  - name: test-user
+    policy:
+      assume-role:
+        action: sts:AssumeRole
+        resource:
+          - arn:aws:iam:012345678912::role/mfa
+          - arn:aws:iam:987654321098::role/mfa
+    rotate: 30 # int in days
