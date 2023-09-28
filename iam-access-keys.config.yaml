@@ -40,7 +40,7 @@ key_rotator:
     CiinaboxKeyRotator:
       named: true
       function_name:
-        Fn::Sub: ${EnvironmentName}-${component_name}-key-rotator
+        Fn::Sub: ${AWS::StackId}-key-rotator
       code: key_rotator
       handler: app.lambda_handler
       runtime: python3.8
