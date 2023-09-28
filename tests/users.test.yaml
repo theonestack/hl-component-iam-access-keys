@@ -11,4 +11,20 @@ users:
         resource:
           - arn:aws:iam:012345678912::role/mfa
           - arn:aws:iam:987654321098::role/mfa
-    rotate: 30 # int in days
+    rotation: 30 # int in days
+    
+key_rotator:
+  roles: {}
+  functions:
+    CiinaboxKeyRotator:
+      named: true
+      function_name:
+        Fn::Sub: ${EnvironmentName}-${component_name}-key-rotator
+      code: key_rotator
+      handler: app.lambda_handler
+      runtime: python3.9
+      timeout: 30
+      role: KeyRotator
+      log_retention: 30
+      allowed_sources:
+        - principal: secretsmanager.amazonaws.com

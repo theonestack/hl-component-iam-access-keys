@@ -25,7 +25,7 @@ CloudFormation do
       UserName user['name']
       Path FnSub '/${EnvironmentName}/keyrotator/'
       
-      if user.has_key('policy')
+      if user.has_key?('policy')
         Policies iam_role_policies(user['policy'])
       end
       
@@ -40,7 +40,7 @@ CloudFormation do
     SecretsManager_Secret("#{resource_name}Secret") {
       Name FnSub("/${EnvironmentName}/iamuser/keyrotated/#{user['name']}")
       Description "IAM user access key for #{user['name']}"
-      SecretString secret_json.tojson
+      SecretString secret_json.to_json
       Tags secret_tags
     }
     
