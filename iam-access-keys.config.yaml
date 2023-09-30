@@ -43,7 +43,7 @@ key_rotator:
         Fn::Sub: ${AWS::StackName}-key-rotator
       code: key_rotator
       handler: app.lambda_handler
-      runtime: python3.8
+      runtime: python3.9
       timeout: 30
       role: KeyRotator
       log_retention: 30
