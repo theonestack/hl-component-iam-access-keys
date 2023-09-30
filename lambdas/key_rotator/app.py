@@ -6,7 +6,6 @@ import json
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
 def lambda_handler(event, context):
     """Secrets Manager Rotation Template
     Rotates a IAM access key in a secretsmanager secret
@@ -61,7 +60,6 @@ def lambda_handler(event, context):
 
     else:
         raise ValueError("Invalid step parameter")
-
 
 def create_secret(service_client, arn, token):
     """Create the secret
@@ -145,13 +143,26 @@ def finish_secret(service_client, arn, token):
             break
     
     # get the user and the current access key so we can clean up the old one
-    secret_dict = get_secret_dict(service_client, arn, token, "AWSCURRENT", required_fields=['User','AccessKeyId'])
+    try:
+        secret_dict = get_secret_dict(service_client, arn, token, "AWSCURRENT", required_fields=['User','AccessKeyId'])
+    except:
+        # If we do not yet have any AccessKey for the newly created USER.
+        secret_dict = get_secret_dict(service_client, arn, token, "AWSCURRENT", required_fields=['User'])
     
     # Finalize by staging the secret version current
     service_client.update_secret_version_stage(SecretId=arn, VersionStage="AWSCURRENT", MoveToVersionId=token, RemoveFromVersionId=current_version)
-    
-    # cleanup the old access key
-    iam_client.delete_access_key(UserName=secret_dict['User'], AccessKeyId=secret_dict['AccessKeyId'])
+
+    try:
+        logger.info(f"Cleanup the AccessKeyId: {secret_dict['AccessKeyId']}.")
+    except:
+        logger.info("There are no any AccessKey yet.")
+
+    try:
+        logger.info("Cleanup the old access key now....")
+        iam_client.delete_access_key(UserName=secret_dict['User'], AccessKeyId=secret_dict['AccessKeyId'])
+    except:
+        pass
+
     logger.info(f"finishSecret: Successfully set AWSCURRENT stage to version {token} for secret {arn}.")
     
 def get_secret_dict(service_client, arn, token, stage, required_fields=[]):
@@ -171,7 +182,11 @@ def get_secret_dict(service_client, arn, token, stage, required_fields=[]):
         KeyError: If the secret json does not contain the expected keys
     """
 
-    secret = service_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage=stage)
+    try:
+        secret = service_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage=stage)
+    except:
+        # If we do not yet have any AccessKey for the newly created USER.
+        secret = service_client.get_secret_value(SecretId=arn, VersionStage=stage)
 
     plaintext = secret['SecretString']
     secret_dict = json.loads(plaintext)
