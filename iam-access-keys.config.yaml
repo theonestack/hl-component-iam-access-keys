@@ -12,7 +12,7 @@ iam_policies:
     condition:
       StringLike:
         secretsmanager:resource/AllowRotationLambdaArn: 
-          Fn::Sub: 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackId}-key-rotator'
+          Fn::Sub: 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-key-rotator'
   iam-manage-keys:
     action:
       - iam:CreateAccessKey
@@ -22,7 +22,7 @@ iam_policies:
       - Fn::Sub: arn:aws:iam::${AWS::AccountId}:user/${EnvironmentName}/keyrotator/*
     condition:
       StringEquals:
-        iam:ResourceTag/ciinabox:name:
+        iam:ResourceTag/EnvironmentName:
           Ref: EnvironmentName
   logging:
     action:
@@ -40,7 +40,7 @@ key_rotator:
     CiinaboxKeyRotator:
       named: true
       function_name:
-        Fn::Sub: ${AWS::StackId}-key-rotator
+        Fn::Sub: ${AWS::StackName}-key-rotator
       code: key_rotator
       handler: app.lambda_handler
       runtime: python3.8
