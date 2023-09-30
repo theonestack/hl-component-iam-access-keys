@@ -101,7 +101,6 @@ def set_secret(service_client, arn, token):
     """
     logging.info("Nothing to do here")
 
-
 def test_secret(service_client, arn, token):
     """Test the secret
     Tests the new IAM access key
