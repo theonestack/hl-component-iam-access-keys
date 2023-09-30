@@ -89,7 +89,7 @@ def create_secret(service_client, arn, token):
     new_secret_dict['SecretAccessKey'] = new_key['AccessKey']['SecretAccessKey']
     
     # Update the secret key id in the secret and set it to a pending state
-    service_client.put_secret_value(SecretId=arn, ClientRequestToken=token, SecretString=new_secret_dict, VersionStages=['AWSPENDING'])
+    service_client.put_secret_value(SecretId=arn, ClientRequestToken=token, SecretString=json.dumps(new_secret_dict), VersionStages=['AWSPENDING'])
 
 def set_secret(service_client, arn, token):
     """Set the secret
