@@ -33,14 +33,11 @@ CloudFormation do
     }
     
     secret_tags = base_tags.clone()  
-    secret_json = {
-      User: Ref("#{resource_name}User")
-    }
     
     SecretsManager_Secret("#{resource_name}Secret") {
       Name FnSub("/${EnvironmentName}/iamuser/keyrotated/#{user['name']}")
       Description "IAM user access key for #{user['name']}"
-      SecretString secret_json.to_json
+      SecretString FnJoin('',['{','"User"',':','"',Ref("#{resource_name}User"),'"','}'])
       Tags secret_tags
     }
     
