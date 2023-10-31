@@ -22,7 +22,7 @@ key_rotator:
         Fn::Sub: ${EnvironmentName}-${component_name}-key-rotator
       code: key_rotator
       handler: app.lambda_handler
-      runtime: python3.9
+      runtime: python3.11
       timeout: 30
       role: KeyRotator
       log_retention: 30
